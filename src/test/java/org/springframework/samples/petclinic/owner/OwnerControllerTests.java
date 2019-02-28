@@ -176,4 +176,71 @@ public class OwnerControllerTests {
             .andExpect(view().name("owners/ownerDetails"));
     }
 
+    @Test
+    public void CreateOwnerWithNoFirstName_Expect_Error() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("lastName", "Bloggs")
+            .param("address", "123 Caramel Street")
+            .param("city", "London")
+            .param("telephone", "01316761638")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "firstName"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "firstName", "NotEmpty"));
+    }
+
+    @Test
+    public void CreateOwnerWithNoLastName_Expect_Error() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("firstName", "Joe")
+            .param("address", "123 Caramel Street")
+            .param("city", "London")
+            .param("telephone", "01316761638")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "lastName"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "NotEmpty"));
+    }
+
+    @Test
+    public void CreateOwnerWithNoCity_Expect_Error() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("firstName", "Joe")
+            .param("lastName", "Bloggs")
+            .param("address", "123 Caramel Street")
+            .param("telephone", "01316761638")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "city"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "city", "NotEmpty"));
+    }
+
+    @Test
+    public void CreateOwnerWithNoTelephone_Expect_Error() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("firstName", "Joe")
+            .param("lastName", "Bloggs")
+            .param("address", "123 Caramel Street")
+            .param("city", "London")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "telephone", "NotEmpty"));
+    }
+
+    @Test
+    public void CreateOwnerWithNoAddress_Expect_Error() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("firstName", "Joe")
+            .param("lastName", "Bloggs")
+            .param("city", "London")
+            .param("telephone", "01316761638")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "address"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "address", "NotEmpty"));
+    }
+
+
+
 }

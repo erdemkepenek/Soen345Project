@@ -107,13 +107,13 @@ public class PetControllerTests {
 
 
     @Test
-    public void testProcessCreationFormDuplicate_Error_Statement() throws Exception {
+    public void testProcessCreationFormWithoutDuplicate() throws Exception {
         // Make a dummy owner
         Owner dummyOwner = new Owner();
 
         // Make a dummy pet
         Pet dummyPet = new Pet();
-        dummyPet.setName("Betty");
+        dummyPet.setName("Bosco");
 
         dummyOwner.addPet(dummyPet);
         dummyPet.setId(33);
@@ -124,12 +124,12 @@ public class PetControllerTests {
             .param("name", "Betty")
             .param("type", "hamster")
             .param("birthDate", "2015-02-12")
-            .param("id","45")
-        )
-            .andExpect(model().attributeHasErrors("pet"))
-            .andExpect(model().attributeHasFieldErrorCode("pet","name","duplicate"));
-//            .andExpect(status().is3xxRedirection())
-//            .andExpect(view().name("redirect:/owners/{ownerId}"));
+                .param("id", "45")
+                )
+//            .andExpect(model().attributeHasErrors(“pet”))
+//            .andExpect(model().attributeHasFieldErrorCode(“pet”,“name”,“duplicate”));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/owners/{ownerId}"));
     }
 
     @Test

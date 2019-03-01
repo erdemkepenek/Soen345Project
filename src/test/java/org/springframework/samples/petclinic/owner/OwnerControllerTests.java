@@ -227,6 +227,20 @@ public class OwnerControllerTests {
             .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
             .andExpect(model().attributeHasFieldErrorCode("owner", "telephone", "NotEmpty"));
     }
+    
+    @Test
+    public void TestPhoneNumberFormat_ShouldBeLessThan10Digits() throws Exception {
+        mockMvc.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID)
+            .param("firstName", "Joe")
+            .param("lastName", "Bloggs")
+            .param("address", "123 Caramel Street")
+            .param("city", "London")
+            .param("telephone", "123456789101212")
+        )
+            .andExpect(model().attributeHasErrors("owner"))
+            .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
+            .andExpect(model().attributeHasFieldErrorCode("owner", "telephone", "Digits"));
+    }
 
     @Test
     public void CreateOwnerWithNoAddress_Expect_Error() throws Exception {
@@ -240,7 +254,4 @@ public class OwnerControllerTests {
             .andExpect(model().attributeHasFieldErrors("owner", "address"))
             .andExpect(model().attributeHasFieldErrorCode("owner", "address", "NotEmpty"));
     }
-
-
-
 }

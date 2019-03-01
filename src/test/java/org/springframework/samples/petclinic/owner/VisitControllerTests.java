@@ -1,5 +1,6 @@
 package org.springframework.samples.petclinic.owner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -7,18 +8,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.util.Locale;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.samples.petclinic.model.Person;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.samples.petclinic.owner.VisitController;
+import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 /**
  * Test class for {@link VisitController}
@@ -30,6 +44,12 @@ import org.springframework.test.web.servlet.MockMvc;
 public class VisitControllerTests {
 
     private static final int TEST_PET_ID = 1;
+    
+    private Validator createValidator() {
+        LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+        localValidatorFactoryBean.afterPropertiesSet();
+        return localValidatorFactoryBean;
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -71,5 +91,20 @@ public class VisitControllerTests {
             .andExpect(status().isOk())
             .andExpect(view().name("pets/createOrUpdateVisitForm"));
     }
+    
+  @Test
+  public void testValidateWhenVisitEmpty() {
+
+	  Visit visit = new Visit();
+	  LocaleContextHolder.setLocale(Locale.ENGLISH);
+      visit.setDescription(null);      
+
+      Validator validator = createValidator();
+      Set<ConstraintViolation<Visit>> constraintViolations = validator
+              .validate(visit);
+      ConstraintViolation<Visit> violation = constraintViolations.iterator().next();
+      assertThat(violation.getMessage()).isEqualTo("must not be empty");
+  }
+
 
 }

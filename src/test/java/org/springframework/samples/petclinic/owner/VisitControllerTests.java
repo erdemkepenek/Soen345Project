@@ -91,6 +91,27 @@ public class VisitControllerTests {
             .andExpect(status().isOk())
             .andExpect(view().name("pets/createOrUpdateVisitForm"));
     }
+  
+   @Test
+    public void testProcessNewVisitFormSuccessWithNoPreviousVisits() throws Exception {
+
+        Owner testOwner = new Owner();
+        Pet testPet = new Pet();
+
+        testPet.setName("George");
+        testOwner.addPet(testPet);
+        testPet.setId(TEST_PET_ID);
+        testPet.setVisitsInternal(null);
+
+        given(this.pets.findById(TEST_PET_ID)).willReturn(testPet);
+
+        mockMvc.perform(post("/owners/*/pets/{petId}/visits/new", TEST_PET_ID)
+            .param("name", "George")
+            .param("description", "Visit Description")
+        )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/owners/{ownerId}"));
+    }
     
   @Test
   public void testValidateWhenVisitEmpty() {

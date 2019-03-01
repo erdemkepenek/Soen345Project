@@ -89,9 +89,11 @@ public class PetControllerTests {
     	Pet dummyPet = new Pet();
     	dummyPet.setName("Betty");
     	
+    	// Add the pet to the dummy owner
     	dummyOwner.addPet(dummyPet);
     	dummyPet.setId(33);
     	
+    	// Stubbing
     	given(this.owners.findById(TEST_OWNER_ID)).willReturn(dummyOwner);
     	
     	mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
@@ -101,8 +103,6 @@ public class PetControllerTests {
         )
     		.andExpect(model().attributeHasErrors("pet"))
     		.andExpect(model().attributeHasFieldErrorCode("pet","name","duplicate"));
-//            .andExpect(status().is3xxRedirection())
-//            .andExpect(view().name("redirect:/owners/{ownerId}"));
     }
 
 
@@ -115,21 +115,21 @@ public class PetControllerTests {
         Pet dummyPet = new Pet();
         dummyPet.setName("Bosco");
 
+        // Add the pet to the dummy owner
         dummyOwner.addPet(dummyPet);
         dummyPet.setId(33);
 
+        // Stubbing
         given(this.owners.findById(TEST_OWNER_ID)).willReturn(dummyOwner);
 
         mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
             .param("name", "Betty")
             .param("type", "hamster")
             .param("birthDate", "2015-02-12")
-                .param("id", "45")
-                )
-//            .andExpect(model().attributeHasErrors(“pet”))
-//            .andExpect(model().attributeHasFieldErrorCode(“pet”,“name”,“duplicate”));
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/owners/{ownerId}"));
+            .param("id", "45")
+        )
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/owners/{ownerId}"));
     }
 
     @Test

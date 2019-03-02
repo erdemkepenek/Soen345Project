@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.springframework.util.SerializationUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Dave Syer
@@ -29,15 +30,27 @@ public class VetTests {
 
     @Test
     public void testSerialization() {
-        Vet vet = new Vet();
-        vet.setFirstName("Zaphod");
-        vet.setLastName("Beeblebrox");
-        vet.setId(123);
+        //mock the Vet Class and allowing it to be serialized
+        Vet mockVet = mock(Vet.class, withSettings().serializable());
+
+        //Set values of mocked object using Person setters
+        mockVet.setFirstName("Zaphod");
+        mockVet.setLastName("Beeblebrox");
+        mockVet.setId(123);
+
+        //Stub getters
+        when(mockVet.getFirstName()).thenReturn("Zaphod");
+        when(mockVet.getLastName()).thenReturn("Beeblebrox");
+        when(mockVet.getId()).thenReturn(123);
+
+        //New Vet object by serialization
         Vet other = (Vet) SerializationUtils
-                .deserialize(SerializationUtils.serialize(vet));
-        assertThat(other.getFirstName()).isEqualTo(vet.getFirstName());
-        assertThat(other.getLastName()).isEqualTo(vet.getLastName());
-        assertThat(other.getId()).isEqualTo(vet.getId());
+                .deserialize(SerializationUtils.serialize(mockVet));
+
+        //Assert values of serialized object are same as mocked object, this means serializable works as expected
+        assertThat(other.getFirstName()).isEqualTo(mockVet.getFirstName());
+        assertThat(other.getLastName()).isEqualTo(mockVet.getLastName());
+        assertThat(other.getId()).isEqualTo(mockVet.getId());
     }
 
 }

@@ -1,9 +1,14 @@
 package org.springframework.samples.petclinic;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Forklifter {
 
@@ -15,7 +20,46 @@ public class Forklifter {
         }catch (SQLException e){
             System.out.println("Connection failed");
         }
+        setSchema(conn);
+        //TODO addData();
 
+    }
+
+    private static void addData() {
+        //TODO Add new Data
+    }
+
+    private static void setSchema(Connection db) {
+            ArrayList<String> commands = parseSQL("src/main/resources/db/sqlite/schema.sql");
+            for(String s : commands){
+                try{
+                    Statement stmnt = db.createStatement();
+                }catch(SQLException e){
+
+                }
+            }
+
+    }
+
+    private static ArrayList<String> parseSQL(String sqlFilePath) {
+        File sqlSchema = new File(sqlFilePath);
+        ArrayList<String> commands = new ArrayList<String>();
+
+        try{
+            Scanner schemaReader = new Scanner(sqlSchema);
+            schemaReader.useDelimiter(";");
+
+            while(schemaReader.hasNext()){
+                commands.add(schemaReader.next().trim()+";");
+            }
+
+            commands.remove(commands.size()-1);
+        }
+            catch(FileNotFoundException e){
+            System.out.println("The Schema File Wasn't found!");
+        }
+
+        return commands;
     }
 
     public static void main(String[] args){

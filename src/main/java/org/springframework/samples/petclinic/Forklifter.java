@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Forklifter {
 
-    public static void doYouEvenForkLift(){
+    public static void doYouEvenForkLift_BuildTables(){
         Connection conn = null;
 
         try {
@@ -21,24 +21,35 @@ public class Forklifter {
             System.out.println("Connection failed");
         }
         setSchema(conn);
-        //TODO addData();
 
     }
+    public static void doYouEvenForkLift_AddData(){
+        Connection conn = null;
 
-    private static void addData() {
-        //TODO Add new Data
+        try {
+            conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/db/sqlite/sqlite.db");
+        }catch (SQLException e){
+            System.out.println("Connection failed");
+        }
+        addData(conn);
+
     }
 
     private static void setSchema(Connection db) {
-            ArrayList<String> commands = parseSQL("src/main/resources/db/sqlite/schema.sql");
-            for(String s : commands){
-                try{
-                    Statement stmnt = db.createStatement();
-                }catch(SQLException e){
+        ArrayList<String> commands = parseSQL("src/main/resources/db/sqlite/schema.sql");
 
-                }
+        for(String s : commands){
+            try{
+                Statement stmnt = db.createStatement();
+                stmnt.execute(s);
+            }catch(SQLException e){
+                System.out.println("Unable to excecute the queries");
             }
+        }
+    }
 
+    private static void addData(Connection db) {
+        //TODO Add new Data
     }
 
     private static ArrayList<String> parseSQL(String sqlFilePath) {
@@ -46,11 +57,11 @@ public class Forklifter {
         ArrayList<String> commands = new ArrayList<String>();
 
         try{
-            Scanner schemaReader = new Scanner(sqlSchema);
-            schemaReader.useDelimiter(";");
+            Scanner sqlReader = new Scanner(sqlSchema);
+            sqlReader.useDelimiter(";");
 
-            while(schemaReader.hasNext()){
-                commands.add(schemaReader.next().trim()+";");
+            while(sqlReader.hasNext()){
+                commands.add(sqlReader.next().trim()+";");
             }
 
             commands.remove(commands.size()-1);
@@ -63,6 +74,6 @@ public class Forklifter {
     }
 
     public static void main(String[] args){
-        doYouEvenForkLift();
+        doYouEvenForkLift_BuildTables();
     }
 }

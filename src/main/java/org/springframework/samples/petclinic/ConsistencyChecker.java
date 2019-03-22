@@ -1,6 +1,7 @@
 package org.springframework.samples.petclinic;
 
 import forklift.OwnerCRUD;
+import forklift.PetsCRUD;
 import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.samples.petclinic.owner.Pet;
@@ -14,6 +15,7 @@ import org.springframework.samples.petclinic.visit.Visit;
 import java.sql.*;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class ConsistencyChecker {
@@ -54,19 +56,20 @@ public class ConsistencyChecker {
             if (actual==null){
                 ownerCRUD.insert(expected);
                 inconsistency++;
-                violation(expected.toString());
+                violation("Owner", expected.getId());
             }
             else if (!expected.equals(actual)) {
                 ownerCRUD.update(expected.getId(), expected);
                 inconsistency++;
-                violation(expected.toString(), actual.toString());
+                violation("Owner", expected.getId());
             }
         }
     }
 
     public void checkPets() throws SQLException{
+        PetsCRUD petCRUD= new PetsCRUD();
         ResultSet pets;
-        HashMap matchingPet
+        ResultSet matchingPet;
         Connection oldConn = null;
         try {
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
@@ -76,18 +79,20 @@ public class ConsistencyChecker {
         pets = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.pets");
 
         while(pets.next()){
-            // GET MATCHING PET FROM EGLEN
-            if (pets.getString("name").equals((String) matchingPet.get("name"))
-                || pets.getDate("birth_date") != (Date) matchingPet.get("birth_date")
-                || pets.getInt("type_id") != (int) matchingPet.get("type_id")
-                || pets.getInt("owner_id") != (int) matchingPet.get("owner_id"))
+            matchingPet = petCRUD.selectPetById(pets.getInt("id"));
+            // GET MATCHING PET FROM EGLEN AND CHECK NULL
+            if (pets.getString("name").equals(matchingPet.getString("name"))
+                || pets.getDate("birth_date") != matchingPet.getDate("birth_date")
+                || pets.getInt("type_id") != matchingPet.getInt("type_id")
+                || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
                 inconsistency++;
+                violation("Pet", pets.getInt("id"));}
         }
     }
 
     public void checkVisits() throws SQLException{
         ResultSet visits;
-        HashMap matchingVisit = ;
+        HashMap<String, List> matchingVisit  ;
         Connection oldConn = null;
         try {
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
@@ -97,11 +102,12 @@ public class ConsistencyChecker {
         visits = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.visits");
 
         while(visits.next()){
-            // GET MATCHING VISIT FROM EGLEN
-            if (visits.getInt("pet_id") != (int) matchingVisit.get("pet_id")
-                || visits.getDate("visit_date") !=  (Date) matchingVisit.get("visit_date")
-                || visits.getString("description").equals((String) matchingVisit.get("description")))
+            // GET MATCHING VISIT FROM EGLEN AND CHECK IF NULL
+            if (visits.getInt("pet_id") != (int) matchingVisit.get("pet_id").get(0)
+                || visits.getDate("visit_date") !=  (Date) matchingVisit.get("visit_date").get(0)
+                || visits.getString("description").equals((String) matchingVisit.get("description").get(0))){
                 inconsistency++;
+                violation("Visit", visits.getInt("id"));}
         }
     }
 
@@ -112,15 +118,7 @@ public class ConsistencyChecker {
         return inconsistency;
     }
 
-    private void violation(String expected, String actual) {
-        System.out.println("Consistency Violation!\n" +
-            "\n\t expected = " + expected
-            + "\n\t actual = " + actual);
-    }
-
-    private void violation(String expected) {
-        System.out.println("Consistency Violation!\n" +
-            "\n\t expected = " + expected
-            + "\n\t actual = null");
+    private void violation(String type, int id) {
+        System.out.println("Consistency Violation: " + type + " with ID " + id);
     }
 }

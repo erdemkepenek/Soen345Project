@@ -61,13 +61,6 @@ public class OwnerCRUD {
             Statement stmt  = conn.createStatement();
             rs    = stmt.executeQuery(sql);
 
-            // loop through the result set
-            while (rs.next()) {
-                System.out.println(rs.getInt("id") +  "\t" +
-                    rs.getString("first_name") + "\t" +
-                    rs.getString("last_name"));
-            }
-
             return rs;
 
         } catch (SQLException e) {
@@ -76,6 +69,37 @@ public class OwnerCRUD {
 
         return null;
     }
+
+    public Owner selectOwnerByLastName(String lastName) {
+        String sql = "SELECT * FROM owners WHERE last_name = '"+lastName+"'";
+        ResultSet rs;
+        Owner owner = new Owner();
+
+        try {
+
+            Connection conn = this.connect();
+            Statement stmt  = conn.createStatement();
+            rs    = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+
+                //put all the values in an owner object
+                owner.setId(rs.getInt("id"));
+                owner.setFirstName(rs.getString("first_name"));
+                owner.setLastName(rs.getString("last_name"));
+                owner.setAddress(rs.getString("address"));
+                owner.setCity(rs.getString("city"));
+                owner.setTelephone(rs.getString("telephone"));
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return owner;
+    }
+
     
     public Owner selectOwnerById(int id){
         String sql = "SELECT * FROM owners WHERE ID = "+id+"";
@@ -96,12 +120,7 @@ public class OwnerCRUD {
                 owner.setAddress(rs.getString("address"));
                 owner.setCity(rs.getString("city"));
                 owner.setTelephone(rs.getString("telephone"));
-                
-                
-                System.out.println(owner.getTelephone());
-                System.out.println(rs.getInt("id") +  "\t" + 
-                                   rs.getString("first_name") + "\t" +
-                                   rs.getString("last_name"));
+
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -151,15 +170,6 @@ public class OwnerCRUD {
     	//Owner boss = new Owner();
     	//boss.setFirstName("john");
     	OwnerCRUD app = new OwnerCRUD();
-        app.selectAll();
-
-        try{
-            System.out.print("Row number is: ");
-            System.out.print(app.readAll().getString("id"));
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
 
         app.selectOwnerById(1);
         

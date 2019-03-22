@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 
-import org.springframework.samples.petclinic.owner.*;;
+import org.springframework.samples.petclinic.owner.*;
 
 public class OwnerCRUD {
 
@@ -33,7 +33,7 @@ public class OwnerCRUD {
      * select all rows in the owners table
      */
     public void selectAll(){
-        String sql = "SELECT id, first_name, last_name FROM owners";
+        String sql = "SELECT * FROM owners";
         
         try (Connection conn = this.connect();
              Statement stmt  = conn.createStatement();

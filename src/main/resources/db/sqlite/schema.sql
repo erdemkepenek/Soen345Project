@@ -1,28 +1,19 @@
-DROP TABLE IF EXISTS vet_specialties;
-DROP TABLE IF EXISTS vets;
-DROP TABLE IF EXISTS specialties;
-DROP TABLE IF EXISTS visits;
-DROP TABLE IF EXISTS pets;
-DROP TABLE IF EXISTS types;
-DROP TABLE IF EXISTS owners;
-
-
-CREATE TABLE vets (
+CREATE TABLE IF NOT EXISTS vets (
                     id         INTEGER IDENTITY PRIMARY KEY,
                     first_name VARCHAR(30),
                     last_name  VARCHAR(30)
 );
-CREATE INDEX vets_last_name
+CREATE INDEX IF NOT EXISTS vets_last_name
   ON vets (last_name);
 
-CREATE TABLE specialties (
+CREATE TABLE IF NOT EXISTS specialties (
                            id   INTEGER IDENTITY PRIMARY KEY,
                            name VARCHAR(80)
 );
-CREATE INDEX specialties_name
+CREATE INDEX IF NOT EXISTS specialties_name
   ON specialties (name);
 
-CREATE TABLE vet_specialties (
+CREATE TABLE IF NOT EXISTS vet_specialties (
                                vet_id       INTEGER NOT NULL,
                                specialty_id INTEGER NOT NULL,
 
@@ -36,14 +27,14 @@ CREATE TABLE vet_specialties (
 
 );
 
-CREATE TABLE types (
+CREATE TABLE IF NOT EXISTS types (
                      id   INTEGER IDENTITY PRIMARY KEY,
                      name VARCHAR(80)
 );
-CREATE INDEX types_name
+CREATE INDEX IF NOT EXISTS types_name
   ON types (name);
 
-CREATE TABLE owners (
+CREATE TABLE IF NOT EXISTS owners (
                       id         INTEGER IDENTITY PRIMARY KEY,
                       first_name VARCHAR(30),
                       last_name  VARCHAR_IGNORECASE(30),
@@ -51,10 +42,10 @@ CREATE TABLE owners (
                       city       VARCHAR(80),
                       telephone  VARCHAR(20)
 );
-CREATE INDEX owners_last_name
+CREATE INDEX IF NOT EXISTS owners_last_name
   ON owners (last_name);
 
-CREATE TABLE pets (
+CREATE TABLE IF NOT EXISTS pets (
                     id         INTEGER IDENTITY PRIMARY KEY,
                     name       VARCHAR(30),
                     birth_date DATE,
@@ -70,10 +61,10 @@ CREATE TABLE pets (
                         REFERENCES types (id)
 
 );
-CREATE INDEX pets_name
+CREATE INDEX IF NOT EXISTS pets_name
   ON pets (name);
 
-CREATE TABLE visits (
+CREATE TABLE IF NOT EXISTS visits (
                       id          INTEGER IDENTITY PRIMARY KEY,
                       pet_id      INTEGER NOT NULL,
                       visit_date  DATE,
@@ -83,5 +74,5 @@ CREATE TABLE visits (
                         FOREIGN KEY (pet_id)
                           REFERENCES pets (id)
 );
-CREATE INDEX visits_pet_id
+CREATE INDEX IF NOT EXISTS visits_pet_id
   ON visits (pet_id);

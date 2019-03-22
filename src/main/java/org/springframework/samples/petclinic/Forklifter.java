@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Forklifter {
 
-    public static void doYouEvenForkLift_BuildTables(){
+    public static void doYouEvenForkLift(){
         Connection conn = null;
 
         try {
@@ -21,19 +21,10 @@ public class Forklifter {
             System.out.println("Connection failed");
         }
         setSchema(conn);
-
-    }
-    public static void doYouEvenForkLift_AddData(){
-        Connection conn = null;
-
-        try {
-            conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/db/sqlite/sqlite.db");
-        }catch (SQLException e){
-            System.out.println("Connection failed");
-        }
         addData(conn);
 
     }
+
 
     private static void setSchema(Connection db) {
         ArrayList<String> commands = parseSQL("src/main/resources/db/sqlite/schema.sql");
@@ -74,6 +65,6 @@ public class Forklifter {
     }
 
     public static void main(String[] args){
-        doYouEvenForkLift_BuildTables();
+        doYouEvenForkLift();
     }
 }

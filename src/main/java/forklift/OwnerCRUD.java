@@ -45,10 +45,36 @@ public class OwnerCRUD {
                                    rs.getString("first_name") + "\t" +
                                    rs.getString("last_name"));
             }
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    public ResultSet readAll() {
+        String sql = "SELECT id, first_name, last_name FROM owners";
+        ResultSet rs;
+
+        try {
+            Connection conn = this.connect();
+            Statement stmt  = conn.createStatement();
+            rs    = stmt.executeQuery(sql);
+
+            // loop through the result set
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") +  "\t" +
+                    rs.getString("first_name") + "\t" +
+                    rs.getString("last_name"));
+            }
+
+            return rs;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
     }
     
     public Owner selectOwnerById(int id){
@@ -126,6 +152,15 @@ public class OwnerCRUD {
     	//boss.setFirstName("john");
     	OwnerCRUD app = new OwnerCRUD();
         app.selectAll();
+
+        try{
+            System.out.print("Row number is: ");
+            System.out.print(app.readAll().getString("id"));
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
         app.selectOwnerById(1);
         
         //Example on how to call the insert methods

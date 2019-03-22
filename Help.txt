@@ -21,3 +21,18 @@ A run configuration named PetClinicApplication should have been created for you 
 Otherwise, run the application by right clicking on the PetClinicApplication main class and choosing Run 'PetClinicApplication'.
 
 
+-------------------------------Setting up MYSQL---------------------------------
+
+1.	Donload docker (https://www.docker.com/get-started)
+2.	Run docker
+3.	Go in projects directory and run the command "docker-compose up"
+4.	Let docker running
+5.	pull form master
+6.	Uncomment the above line which is located in application-mysql.properties
+		# spring.datasource.initialization-mode=always
+7.	Run the application and comment back the above line
+
+-----------------------------------------------------------------------------------
+
+		
+		

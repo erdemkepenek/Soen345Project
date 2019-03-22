@@ -51,8 +51,10 @@ public class OwnerCRUD {
 
     }
     
-    public void selectOwnerById(int id){
-        String sql = "SELECT id, first_name, last_name FROM owners WHERE ID = "+id+"";
+    public Owner selectOwnerById(int id){
+        String sql = "SELECT * FROM owners WHERE ID = "+id+"";
+        
+        Owner owner = new Owner();
         
         try (Connection conn = this.connect();
              Statement stmt  = conn.createStatement();
@@ -60,6 +62,17 @@ public class OwnerCRUD {
             
             // loop through the result set
             while (rs.next()) {
+            	
+            //put all the values in an owner object	
+            	owner.setId(rs.getInt("id"));
+            	owner.setFirstName(rs.getString("first_name"));
+                owner.setLastName(rs.getString("last_name"));
+                owner.setAddress(rs.getString("address"));
+                owner.setCity(rs.getString("city"));
+                owner.setTelephone(rs.getString("telephone"));
+                
+                
+                System.out.println(owner.getTelephone());
                 System.out.println(rs.getInt("id") +  "\t" + 
                                    rs.getString("first_name") + "\t" +
                                    rs.getString("last_name"));
@@ -67,7 +80,7 @@ public class OwnerCRUD {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
+        return owner;
     }
     
 
@@ -136,6 +149,8 @@ public class OwnerCRUD {
         owner.setTelephone("6166171");
         System.out.println(owner.getTelephone());
         
-        app.update(5,owner);
+        System.out.println(app.selectOwnerById(77).getAddress());
+        
+        
     }
 }

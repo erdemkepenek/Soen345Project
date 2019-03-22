@@ -8,6 +8,10 @@ docker-compose up
 // How to run the project with maven
 ./mvnw spring-boot:run
 
+//Run the project from terminal 
+./mvnw package
+java -jar target/*.jar
+
 //Run in IntelliJ
 In the main menu, choose File -> Open and select the Petclinic pom.xml. Click on the Open button.
 

@@ -11,11 +11,9 @@ import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.vet.Vets;
 import org.springframework.samples.petclinic.visit.Visit;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
+import java.util.HashMap;
 
 
 public class ConsistencyChecker {
@@ -68,7 +66,7 @@ public class ConsistencyChecker {
 
     public void checkPets() throws SQLException{
         ResultSet pets;
-        ResultSet matchingPet
+        HashMap matchingPet
         Connection oldConn = null;
         try {
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
@@ -79,17 +77,17 @@ public class ConsistencyChecker {
 
         while(pets.next()){
             // GET MATCHING PET FROM EGLEN
-            if (pets.getString("name").equals(matchingPet.getString("name"))
-                || pets.getDate("birth_date") != matchingPet.getDate("birth_date")
-                || pets.getInt("type_id") != matchingPet.getInt("type_id")
-                || pets.getInt("owner_id") != matchingPet.getInt("owner_id"))
+            if (pets.getString("name").equals((String) matchingPet.get("name"))
+                || pets.getDate("birth_date") != (Date) matchingPet.get("birth_date")
+                || pets.getInt("type_id") != (int) matchingPet.get("type_id")
+                || pets.getInt("owner_id") != (int) matchingPet.get("owner_id"))
                 inconsistency++;
         }
     }
 
     public void checkVisits() throws SQLException{
         ResultSet visits;
-        ResultSet matchingVisit;
+        HashMap matchingVisit = ;
         Connection oldConn = null;
         try {
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
@@ -100,9 +98,9 @@ public class ConsistencyChecker {
 
         while(visits.next()){
             // GET MATCHING VISIT FROM EGLEN
-            if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
-                || visits.getDate("visit_date") != matchingVisit.getDate("visit_date")
-                || visits.getString("description").equals(matchingVisit.getString("description")))
+            if (visits.getInt("pet_id") != (int) matchingVisit.get("pet_id")
+                || visits.getDate("visit_date") !=  (Date) matchingVisit.get("visit_date")
+                || visits.getString("description").equals((String) matchingVisit.get("description")))
                 inconsistency++;
         }
     }

@@ -1,0 +1,19 @@
+//Regenerate jacoco report:
+
+mvmw test Jacoco:report
+
+//Run mysql with docker (run docker-compose.yml):
+docker-compose up
+
+// How to run the project with maven
+./mvnw spring-boot:run
+
+//Run in IntelliJ
+In the main menu, choose File -> Open and select the Petclinic pom.xml. Click on the Open button.
+
+./mvnw generate-resources or right click on the spring-petclinic project then Maven -> Generates sources and Update Folders.
+
+A run configuration named PetClinicApplication should have been created for you if you're using a recent Ultimate version.
+Otherwise, run the application by right clicking on the PetClinicApplication main class and choosing Run 'PetClinicApplication'.
+
+

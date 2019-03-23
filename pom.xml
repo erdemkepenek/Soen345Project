@@ -71,6 +71,14 @@
       <scope>runtime</scope>
     </dependency>
 
+	<!-- Library that helps with sqlite -->
+	<dependency>
+          <groupId>org.xerial</groupId>
+          <artifactId>sqlite-jdbc</artifactId>
+          <version>3.27.2</version>
+          <scope>runtime</scope>
+      </dependency>
+
     <!-- caching -->
     <dependency>
       <groupId>javax.cache</groupId>

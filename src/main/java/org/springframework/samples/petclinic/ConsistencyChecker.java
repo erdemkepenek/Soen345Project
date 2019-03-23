@@ -81,13 +81,17 @@ public class ConsistencyChecker {
 
         while(pets.next()){
             matchingPet = petCRUD.selectPetById(pets.getInt("id"));
-            // GET MATCHING PET FROM EGLEN AND CHECK NULL
-            if (pets.getString("name").equals(matchingPet.getString("name"))
+            if (matchingPet == null){
+                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+            }
+            else if (pets.getString("name").equals(matchingPet.getString("name"))
                 || pets.getDate("birth_date") != matchingPet.getDate("birth_date")
                 || pets.getInt("type_id") != matchingPet.getInt("type_id")
                 || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
                 inconsistency++;
-                violation("Pet", pets.getInt("id"));}
+                violation("Pet", pets.getInt("id"));
+                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+                }
         }
     }
 
@@ -104,13 +108,16 @@ public class ConsistencyChecker {
         visits = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.visits");
 
         while(visits.next()){
-            // GET MATCHING VISIT FROM EGLEN AND CHECK IF NULL
             matchingVisit= visitsCRUD.selectVisitById(visits.getInt("id"));
-            if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
+            if (matchingVisit == null){
+                visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));
+            }
+            else if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
                 || visits.getDate("visit_date") != matchingVisit.getDate("visit_date")
                 || visits.getString("description").equals(matchingVisit.getString("description"))){
                 inconsistency++;
-                violation("Visit", visits.getInt("id"));}
+                violation("Visit", visits.getInt("id"));
+                visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));}
         }
     }
 

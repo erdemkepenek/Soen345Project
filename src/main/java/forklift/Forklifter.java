@@ -20,12 +20,22 @@ public class Forklifter {
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/db/sqlite/sqlite.db");
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
+            buildDatabase(conn, true);
+            addData(oldConn,conn);
+            System.out.println("Forklift complete!, Enjoy 😉");
         }catch (SQLException e){
             System.out.println("Connection failed");
         }
-        buildDatabase(conn, true);
-        addData(oldConn,conn);
-        System.out.println("Forklift complete!, Enjoy 😉");
+        finally {
+           try {
+               conn.close();
+               oldConn.close();
+           }catch (SQLException e ){
+               System.out.println("The connections weren't open");
+           }
+
+        }
+
 
     }
 

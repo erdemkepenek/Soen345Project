@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic;
 
 import forklift.OwnerCRUD;
 import forklift.PetsCRUD;
+import forklift.VisitsCRUD;
 import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.samples.petclinic.owner.OwnerRepository;
 import org.springframework.samples.petclinic.owner.Pet;
@@ -92,7 +93,8 @@ public class ConsistencyChecker {
 
     public void checkVisits() throws SQLException{
         ResultSet visits;
-        HashMap<String, List> matchingVisit  ;
+        ResultSet matchingVisit;
+        VisitsCRUD visitsCRUD = new VisitsCRUD();
         Connection oldConn = null;
         try {
             oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
@@ -103,9 +105,10 @@ public class ConsistencyChecker {
 
         while(visits.next()){
             // GET MATCHING VISIT FROM EGLEN AND CHECK IF NULL
-            if (visits.getInt("pet_id") != (int) matchingVisit.get("pet_id").get(0)
-                || visits.getDate("visit_date") !=  (Date) matchingVisit.get("visit_date").get(0)
-                || visits.getString("description").equals((String) matchingVisit.get("description").get(0))){
+            matchingVisit= visitsCRUD.selectVisitById(visits.getInt("id"));
+            if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
+                || visits.getDate("visit_date") != matchingVisit.getDate("visit_date")
+                || visits.getString("description").equals(matchingVisit.getString("description"))){
                 inconsistency++;
                 violation("Visit", visits.getInt("id"));}
         }

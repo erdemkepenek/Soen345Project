@@ -11,14 +11,7 @@ public class SimpleVisit {
 	private Date visit_date;
 	private String description;
 	
-	SimpleVisit(){}
 	
-	SimpleVisit(int id, int pet_id, Date visit_date, String description) {
-		this.id=id;
-		this.pet_id=pet_id;
-		this.visit_date=visit_date;
-		this.description=description;
-	}
 	
 	public int getId() {
         return this.id;
@@ -34,6 +27,22 @@ public class SimpleVisit {
 	public String getDescription() {
         return this.description;
     }
+	
+	public void setId(int id) {
+		this.id=id;
+    }
+	
+	public void setPetId(int pet_id) {
+		this.pet_id=pet_id;
+    }
+	public void setDate(Date visit_date) {
+		this.visit_date=visit_date;
+    }
+	
+	public void setDescription(String description) {
+		this.description=description;
+    }
+	
 	
     
 }

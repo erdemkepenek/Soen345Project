@@ -82,7 +82,7 @@ public class ConsistencyChecker {
         while(pets.next()){
             matchingPet = petCRUD.selectPetById(pets.getInt("id"));
             if (matchingPet == null){
-                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
             }
             else if (pets.getString("name").equals(matchingPet.getString("name"))
                 || pets.getDate("birth_date") != matchingPet.getDate("birth_date")
@@ -90,7 +90,7 @@ public class ConsistencyChecker {
                 || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
                 inconsistency++;
                 violation("Pet", pets.getInt("id"));
-                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
                 }
         }
     }

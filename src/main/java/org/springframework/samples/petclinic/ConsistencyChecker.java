@@ -88,15 +88,15 @@ public class ConsistencyChecker {
             matchingPet = petCRUD.selectPetById(pets.getInt("id"));
             //System.out.println(matchingPet.getString("name"));
             if (matchingPet == null){
-                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getString("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
+                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
             }
             else if (!pets.getString("name").equals(matchingPet.getString("name"))
                 || !pets.getDate("birth_date").toString().equals(matchingPet.getString("birth_date"))
                 || pets.getInt("type_id") != matchingPet.getInt("type_id")
                 || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
                 inconsistency++;
-                violation("Pet", pets.getString("birth_date"));
-                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getString("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
+                violation("Pet", pets.getInt("id"));
+                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
                 }
         }
         oldConn.close();
@@ -117,14 +117,14 @@ public class ConsistencyChecker {
         while(visits.next()){
             matchingVisit= visitsCRUD.selectVisitById(visits.getInt("id"));
             if (matchingVisit == null){
-                visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));
+                visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));
             }
             else if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
                 || visits.getDate("visit_date").toString().equals(matchingVisit.getString("visit_date"))
                 || visits.getString("description").equals(matchingVisit.getString("description"))){
                 inconsistency++;
                 violation("Visit", visits.getInt("id"));
-                visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));}
+                visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));}
         }
         oldConn.close();
     }

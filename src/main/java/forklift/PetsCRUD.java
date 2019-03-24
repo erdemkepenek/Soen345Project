@@ -1,18 +1,13 @@
 package forklift;
 
-import java.sql.DriverManager;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
+import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.sql.PreparedStatement;
 
 import org.springframework.samples.petclinic.owner.*;
 
@@ -51,7 +46,7 @@ public class PetsCRUD {
             while (rs.next()) {
                 System.out.println(rs.getInt("id") +  "\t" + 
                 				   rs.getString("name") +  "\t" + 
-                                   rs.getString("birth_date") + "\t" +
+                                   rs.getDate("birth_date") + "\t" +
                                    rs.getInt("type_id") + "\t" +
                                    rs.getInt("owner_id"));
             }
@@ -82,7 +77,7 @@ public class PetsCRUD {
     
 
     
-    public void insert(int id, String name, String birth_date, int type_id, int owner_id) {
+    public void insert(int id, String name, java.sql.Date birth_date, int type_id, int owner_id) {
    	 String sql = "INSERT INTO pets VALUES ('"+id+"','"+name+"', "+birth_date+", '"+type_id+"', '"+owner_id+"')";
    	 				
    	 System.out.println(sql); 
@@ -94,7 +89,7 @@ public class PetsCRUD {
        }
    }
     
-    public void update(int id, String name, String birth_date, int type_id, int owner_id) {
+    public void update(int id, String name, java.sql.Date birth_date, int type_id, int owner_id) {
      	 String sql = "UPDATE pets SET name='"+name+"', birth_date='"+birth_date+"', type_id='"+type_id+"', owner_id='"+owner_id+"' WHERE (id='"+id+"')";
      	 				
      	 System.out.println(sql); 
@@ -136,11 +131,11 @@ public class PetsCRUD {
 			e.printStackTrace();
 		}
         */
-        
-        
-        String birth_date = "2019-02-01";
+
+
+        java.sql.Date d= new Date(Calendar.getInstance().getTimeInMillis());
    
-        app.update(99,"john",birth_date,1,1);
+        app.update(99,"john",d,1,1);
         
         
     }

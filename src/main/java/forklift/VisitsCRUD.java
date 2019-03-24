@@ -1,6 +1,7 @@
 package forklift;
 
 import java.sql.*;
+import java.util.Calendar;
 
 public class VisitsCRUD {
 
@@ -34,7 +35,7 @@ public class VisitsCRUD {
             while (rs.next()) {
                 System.out.println(rs.getInt("id") +  "\t" +
                     rs.getInt("pet_id") +  "\t" +
-                    rs.getString("visit_date") + "\t" +
+                    rs.getDate("visit_date") + "\t" +
                     rs.getString("description"));
             }
         } catch (SQLException e) {
@@ -78,7 +79,7 @@ public class VisitsCRUD {
         return null;
     }
 
-    public void insert(int id, int pet_id, String visit_date, String description) {
+    public void insert(int id, int pet_id, java.sql.Date visit_date, String description) {
         String sql = "INSERT INTO visits VALUES ('"+id+"','"+pet_id+"', "+visit_date+", '"+description+"')";
 
         System.out.println(sql);
@@ -90,7 +91,7 @@ public class VisitsCRUD {
         }
     }
 
-    public void update(int id, int pet_id, String visit_date, String description) {
+    public void update(int id, int pet_id, java.sql.Date visit_date, String description) {
         String sql = "UPDATE visits SET pet_id='"+pet_id+"', visit_date='"+visit_date+"', description='"+description+"' WHERE (id='"+id+"')";
 
         System.out.println(sql);
@@ -118,9 +119,9 @@ public class VisitsCRUD {
 
         VisitsCRUD app = new VisitsCRUD();
 
-        String visit_date = "2019-03-05";
+        java.sql.Date d = new Date(Calendar.getInstance().getTimeInMillis());
 
-        app.update(5, 9, visit_date, "rabies shot");
+        app.update(1, 9, d, "rabies shot");
 
     }
 }

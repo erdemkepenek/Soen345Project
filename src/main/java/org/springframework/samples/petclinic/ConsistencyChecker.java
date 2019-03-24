@@ -110,14 +110,14 @@ public class ConsistencyChecker {
         while(visits.next()){
             matchingVisit= visitsCRUD.selectVisitById(visits.getInt("id"));
             if (matchingVisit == null){
-                visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));
+                visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));
             }
             else if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
                 || visits.getDate("visit_date") != matchingVisit.getDate("visit_date")
                 || visits.getString("description").equals(matchingVisit.getString("description"))){
                 inconsistency++;
                 violation("Visit", visits.getInt("id"));
-                visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));}
+                visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));}
         }
     }
 

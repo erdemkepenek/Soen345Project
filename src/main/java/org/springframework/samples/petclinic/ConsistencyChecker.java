@@ -125,10 +125,8 @@ public class ConsistencyChecker {
     }
 
 
-/*
-    public void checkVisits() throws SQLException{
-        ResultSet visits;
 
+    public void checkVisits() throws SQLException{
         ResultSet matchingVisit;
         VisitsCRUD visitsCRUD = new VisitsCRUD();
        try(ResultSet visits = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.visits")){
@@ -146,15 +144,20 @@ public class ConsistencyChecker {
                 visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));}
         }
         oldConn.close();
-    } */
+    }}
 
 
     public int checkConsistency() throws SQLException{
         this.checkOwners();
-        this.checkPets();
-        this.checkVisits();
+      //  this.checkPets();
+        //this.checkVisits();
         return inconsistency;
     }
+
+    public void resetCounter(){
+        inconsistency = 0;
+    }
+
 
     private void violation(String type, int id) {
         System.out.println("Consistency Violation: " + type + " with ID " + id);
@@ -166,4 +169,5 @@ public class ConsistencyChecker {
     public static void main(String[] args) throws SQLException{
         System.out.println("There are "+ConsistencyChecker.getInstance().checkConsistency()+" inconsistencies.");
     }
+
 }

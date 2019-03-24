@@ -70,6 +70,11 @@
       <artifactId>mysql-connector-java</artifactId>
       <scope>runtime</scope>
     </dependency>
+      <dependency>
+          <groupId>com.github.gwenn</groupId>
+          <artifactId>sqlite-dialect</artifactId>
+          <version>master</version>
+      </dependency>
 
 	<!-- Library that helps with sqlite -->
 	<dependency>
@@ -243,6 +248,10 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+          <repository>
+              <id>jitpack.io</id>
+              <url>https://jitpack.io</url>
+          </repository>
   </repositories>
 
   <pluginRepositories>

@@ -16,8 +16,13 @@
 
 package org.springframework.samples.petclinic;
 
+import forklift.Forklifter;
+import forklift.OwnerCRUD;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.samples.petclinic.owner.Owner;
+
+import java.sql.SQLException;
 
 /**
  * PetClinic Spring Boot Application.
@@ -28,8 +33,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PetClinicApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         SpringApplication.run(PetClinicApplication.class, args);
+        Forklifter.doYouEvenForkLift();
+        ConsistencyChecker consistencyChecker = ConsistencyChecker.getInstance();
+        // Shadow write mode
+        consistencyChecker.setWrite(true);
+        consistencyChecker.setRead(false);
+
     }
 
 }

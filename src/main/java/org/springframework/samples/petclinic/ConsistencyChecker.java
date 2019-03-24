@@ -59,12 +59,17 @@ public class ConsistencyChecker {
                 inconsistency++;
                 violation("Owner", expected.getId());
             }
-            else if (!expected.equals(actual)) {
+            else if (!expected.getFirstName().equals(actual.getFirstName())
+                || !expected.getLastName().equals(actual.getLastName())
+                || !expected.getAddress().equals(actual.getAddress())
+                ||  !expected.getCity().equals(actual.getCity())
+                || !expected.getTelephone().equals(actual.getTelephone())) {
                 ownerCRUD.update(expected.getId(), expected);
                 inconsistency++;
                 violation("Owner", expected.getId());
             }
         }
+        oldConn.close();
     }
 
     public void checkPets() throws SQLException{
@@ -81,18 +86,20 @@ public class ConsistencyChecker {
 
         while(pets.next()){
             matchingPet = petCRUD.selectPetById(pets.getInt("id"));
+            //System.out.println(matchingPet.getString("name"));
             if (matchingPet == null){
-                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getString("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
             }
-            else if (pets.getString("name").equals(matchingPet.getString("name"))
-                || pets.getDate("birth_date") != matchingPet.getDate("birth_date")
+            else if (!pets.getString("name").equals(matchingPet.getString("name"))
+                || !pets.getDate("birth_date").toString().equals(matchingPet.getString("birth_date"))
                 || pets.getInt("type_id") != matchingPet.getInt("type_id")
                 || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
                 inconsistency++;
-                violation("Pet", pets.getInt("id"));
-                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date").toString(), pets.getInt("type_id"), pets.getInt("owner_id"));
+                violation("Pet", pets.getString("birth_date"));
+                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getString("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
                 }
         }
+        oldConn.close();
     }
 
     public void checkVisits() throws SQLException{
@@ -113,22 +120,27 @@ public class ConsistencyChecker {
                 visitsCRUD.insert(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));
             }
             else if (visits.getInt("pet_id") != matchingVisit.getInt("pet_id")
-                || visits.getDate("visit_date") != matchingVisit.getDate("visit_date")
+                || visits.getDate("visit_date").toString().equals(matchingVisit.getString("visit_date"))
                 || visits.getString("description").equals(matchingVisit.getString("description"))){
                 inconsistency++;
                 violation("Visit", visits.getInt("id"));
                 visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getString("visit_date"), visits.getString("description"));}
         }
+        oldConn.close();
     }
 
     public int checkConsistency() throws SQLException{
         this.checkOwners();
-        this.checkPets();
-        this.checkVisits();
+        //this.checkPets();
+        //this.checkVisits();
         return inconsistency;
     }
 
     private void violation(String type, int id) {
         System.out.println("Consistency Violation: " + type + " with ID " + id);
+    }
+
+    private void violation(String type, String date) {
+        System.out.println("Consistency Violation: " + type + " with Date " + date);
     }
 }

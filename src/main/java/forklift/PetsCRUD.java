@@ -1,9 +1,15 @@
 package forklift;
 
+
+import java.util.Date;
 import java.sql.*;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -58,27 +64,52 @@ public class PetsCRUD {
     
     
     
-    public ResultSet selectPetById(int id) {
+    public SimplePet selectPetById(int id) {
     	String sql = "SELECT * FROM pets WHERE ID = "+id+"";
-        ResultSet rs;
+    	System.out.println(sql); 
+    	SimplePet pet = new SimplePet();
+        
+        try (Connection conn = this.connect();
+             Statement stmt  = conn.createStatement();
+             ResultSet rs    = stmt.executeQuery(sql)){
+            
+            // loop through the result set
+            while (rs.next()) {
+            	
+            	//------------date conversion, string to localdate to date-------------
+            	
+            	String dateString = rs.getString("birth_date");
+            	
+            	System.out.println(dateString);
+            	LocalDate localDate = LocalDate.parse(dateString);
+            	Date birth_date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            	System.out.println("I am ready to be put in the pet object"+birth_date);
+            	
+             	//------------end date conversion--------
+             	
+            	pet.setId(rs.getInt("id"));
+            	pet.setName(rs.getString("name"));
+            	pet.setDate(birth_date);
+            	pet.setType(rs.getInt("type_id"));
+            	pet.setOwner(rs.getInt("owner_id"));
+           
+            //put all the values in a simplePet object
+            
 
-        try {
-            Connection conn = this.connect();
-            Statement stmt  = conn.createStatement();
-            rs    = stmt.executeQuery(sql);
-            return rs;
-
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
-        return null;
+        return pet;
     }
     
 
     
-    public void insert(int id, String name, java.sql.Date birth_date, int type_id, int owner_id) {
-   	 String sql = "INSERT INTO pets VALUES ('"+id+"','"+name+"', "+birth_date+", '"+type_id+"', '"+owner_id+"')";
+    public void insert(SimplePet pet) {
+    	//Converting from java date to String
+    	String birth_date = new SimpleDateFormat("yyyy-MM-dd").format(pet.getDate());
+   	 
+    	String sql = "INSERT INTO pets VALUES ('"+pet.getId()+"','"+pet.getName()+"', '"+birth_date+"', '"+pet.getType()+"', '"+pet.getOwner()+"')";
    	 				
    	 System.out.println(sql); 
    	 try (Connection conn = this.connect();
@@ -89,8 +120,11 @@ public class PetsCRUD {
        }
    }
     
-    public void update(int id, String name, java.sql.Date birth_date, int type_id, int owner_id) {
-     	 String sql = "UPDATE pets SET name='"+name+"', birth_date='"+birth_date+"', type_id='"+type_id+"', owner_id='"+owner_id+"' WHERE (id='"+id+"')";
+    public void update(int id, SimplePet pet) {
+    	//Converting from java date to String
+    	String birth_date = new SimpleDateFormat("yyyy-MM-dd").format(pet.getDate());
+    	
+    	String sql = "UPDATE pets SET name='"+pet.getName()+"', birth_date='"+birth_date+"', type_id='"+pet.getType()+"', owner_id='"+pet.getOwner()+"' WHERE (id='"+id+"')";
      	 				
      	 System.out.println(sql); 
      	 try (Connection conn = this.connect();
@@ -118,25 +152,22 @@ public class PetsCRUD {
     	//boss.setFirstName("john");
     	PetsCRUD app = new PetsCRUD();
         //app.selectAll();
- 
-        /*
-    	try {
-			System.out.println(app.selectPetById(13).getInt("id"));
-			System.out.println(app.selectPetById(13).getString("name"));
-			System.out.println(app.selectPetById(13).getString("birth_date"));
-			System.out.println(app.selectPetById(13).getInt("type_id"));
-			System.out.println(app.selectPetById(13).getInt("owner_id"));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        */
+    	SimplePet test = app.selectPetById(13);
+    	SimplePet test1 = app.selectPetById(99);
+    	test1.setId(1781);
+    	app.update(10,test1);
+    	app.delete(4);
+    	
+    	System.out.println(test.getId());
+		System.out.println(test.getName());
+		System.out.println(test.getDate());
+		System.out.println(test.getType());
+		System.out.println(test.getOwner());
+		
+		//Date d1 = Date.valueOf(test.getDate("birth_date").toString()).getTime() != java.sql.Date.valueOf(matchingPet.getString("birth_date")).getTime();
+			
+		
 
-
-        java.sql.Date d= new Date(Calendar.getInstance().getTimeInMillis());
-   
-        app.update(99,"john",d,1,1);
-        
         
     }
 

@@ -2,6 +2,7 @@ package org.springframework.samples.petclinic;
 
 import forklift.OwnerCRUD;
 import forklift.PetsCRUD;
+import forklift.SimplePet;
 import forklift.VisitsCRUD;
 import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.samples.petclinic.owner.OwnerRepository;
@@ -83,30 +84,51 @@ public class ConsistencyChecker {
     }
 
     public void checkPets() throws SQLException{
-        PetsCRUD petCRUD= new PetsCRUD();
+        SimplePet expected = new SimplePet();
+        SimplePet actual;
+        PetsCRUD petsCRUD= new PetsCRUD();
+
         ResultSet pets;
-        ResultSet matchingPet;
+        Connection oldConn = null;
+        try {
+            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
+        }catch (SQLException e){
+            System.out.println("Connection failed");
+        }
 
         pets = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.pets");
 
-        while(pets.next()){
-            matchingPet = petCRUD.selectPetById(pets.getInt("id"));
-            //System.out.println(matchingPet.getString("name"));
-            if (matchingPet == null){
-                petCRUD.insert(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
-            }
-            else if (!pets.getString("name").equals(matchingPet.getString("name"))
-                || Date.valueOf(pets.getDate("birth_date").toString()).getTime() != java.sql.Date.valueOf(matchingPet.getString("birth_date")).getTime()
-                || pets.getInt("type_id") != matchingPet.getInt("type_id")
-                || pets.getInt("owner_id") != matchingPet.getInt("owner_id")){
+        while (pets.next()){
+            expected.setId(pets.getInt("id"));
+            expected.setName(pets.getString("name"));
+            expected.setDate(pets.getDate("birth_date"));
+            expected.setType(pets.getInt("type_id"));
+            expected.setOwner(pets.getInt("owner_id"));
+
+            actual = petsCRUD.selectPetById(expected.getId());
+            if (actual==null){
+            	petsCRUD.insert(expected);
                 inconsistency++;
-                violation("Pet", pets.getInt("id"));
-                petCRUD.update(pets.getInt("id"), pets.getString("name"), pets.getDate("birth_date"), pets.getInt("type_id"), pets.getInt("owner_id"));
-                }
+                violation("Owner", expected.getId());
+            }
+
+            else if (!expected.getName().equals(actual.getName())
+                || !expected.getDate().equals(actual.getDate())
+                || expected.getType()!=(actual.getType())
+                ||  expected.getOwner()!=(actual.getOwner())) {
+            	petsCRUD.update(expected.getId(), expected);
+
+                inconsistency++;
+                violation("Pet", expected.getId());
+            }
         }
     }
 
-    public void checkVisits(){
+
+/*
+    public void checkVisits() throws SQLException{
+        ResultSet visits;
+
         ResultSet matchingVisit;
         VisitsCRUD visitsCRUD = new VisitsCRUD();
        try(ResultSet visits = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.visits")){
@@ -122,10 +144,10 @@ public class ConsistencyChecker {
                 inconsistency++;
                 violation("Visit", visits.getInt("id"));
                 visitsCRUD.update(visits.getInt("id"), visits.getInt("pet_id"), visits.getDate("visit_date"), visits.getString("description"));}
-        }}catch (SQLException e){
-           System.out.println("something happened");
-       }
-    }
+        }
+        oldConn.close();
+    } */
+
 
     public int checkConsistency() throws SQLException{
         this.checkOwners();

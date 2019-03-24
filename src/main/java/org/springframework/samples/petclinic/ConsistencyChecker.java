@@ -66,7 +66,7 @@ public class ConsistencyChecker {
             expected.setTelephone(owners.getString("telephone"));
 
             actual = ownerCRUD.selectOwnerById(expected.getId());
-            if (actual==null){
+            if (actual.getId()==null){
                 ownerCRUD.insert(expected);
                 inconsistency++;
                 violation("Owner", expected.getId());

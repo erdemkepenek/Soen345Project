@@ -89,12 +89,6 @@ public class ConsistencyChecker {
         PetsCRUD petsCRUD= new PetsCRUD();
 
         ResultSet pets;
-        Connection oldConn = null;
-        try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
-        }catch (SQLException e){
-            System.out.println("Connection failed");
-        }
 
         pets = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.pets");
 

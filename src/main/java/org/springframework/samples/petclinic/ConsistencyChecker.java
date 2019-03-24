@@ -26,6 +26,8 @@ public class ConsistencyChecker {
     Connection oldConn = null;
     private static ConsistencyChecker consistencyChecker = new ConsistencyChecker();
     private int inconsistency = 0;
+    boolean write= false;
+    boolean read = false;
 
 
     public static ConsistencyChecker getInstance() {
@@ -34,7 +36,7 @@ public class ConsistencyChecker {
 
     private ConsistencyChecker() {
         try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
+            oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
         }catch (SQLException e){
             System.out.println("Connection failed");
         }
@@ -66,7 +68,7 @@ public class ConsistencyChecker {
             expected.setTelephone(owners.getString("telephone"));
 
             actual = ownerCRUD.selectOwnerById(expected.getId());
-            if (actual==null){
+            if (actual.getId()==null){
                 ownerCRUD.insert(expected);
                 inconsistency++;
                 violation("Owner", expected.getId());
@@ -89,12 +91,6 @@ public class ConsistencyChecker {
         PetsCRUD petsCRUD= new PetsCRUD();
 
         ResultSet pets;
-        Connection oldConn = null;
-        try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
-        }catch (SQLException e){
-            System.out.println("Connection failed");
-        }
 
         pets = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.pets");
 
@@ -163,9 +159,23 @@ public class ConsistencyChecker {
         System.out.println("Consistency Violation: " + type + " with ID " + id);
     }
 
-    private void violation(String type, String date) {
-        System.out.println("Consistency Violation: " + type + " with Date " + date);
+    public boolean getWrite(){
+        return write;
     }
+
+    public void setWrite(boolean write){
+        this.write = write;
+    }
+
+    public boolean getRead(){
+        return read;
+    }
+
+    public void setRead(boolean read){
+        this.read = read;
+    }
+
+
     public static void main(String[] args) throws SQLException{
         System.out.println("There are "+ConsistencyChecker.getInstance().checkConsistency()+" inconsistencies.");
     }

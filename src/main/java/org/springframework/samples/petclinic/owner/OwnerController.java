@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import org.springframework.samples.petclinic.ConsistencyChecker;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -59,12 +61,20 @@ class OwnerController {
     }
 
     @PostMapping("/owners/new")
-    public String processCreationForm(@Valid Owner owner, BindingResult result) {
+    public String processCreationForm(@Valid Owner owner, BindingResult result) throws SQLException {
         if (result.hasErrors()) {
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         } else {
+            ConsistencyChecker consistencyChecker = ConsistencyChecker.getInstance();
+            if (!consistencyChecker.getWrite()){
             this.owners.save(owner);
-            return "redirect:/owners/" + owner.getId();
+            return "redirect:/owners/" + owner.getId();}
+            else {
+                this.owners.save(owner);
+                consistencyChecker.resetCounter();
+                System.out.println(consistencyChecker.checkConsistency());
+                return "redirect:/owners/" + owner.getId();
+            }
         }
     }
 
@@ -107,13 +117,22 @@ class OwnerController {
     }
 
     @PostMapping("/owners/{ownerId}/edit")
-    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId) {
+    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId) throws SQLException{
         if (result.hasErrors()) {
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         } else {
+            ConsistencyChecker consistencyChecker = ConsistencyChecker.getInstance();
+            if (!consistencyChecker.getWrite()){
             owner.setId(ownerId);
             this.owners.save(owner);
-            return "redirect:/owners/{ownerId}";
+            return "redirect:/owners/{ownerId}";}
+            else{
+                owner.setId(ownerId);
+                this.owners.save(owner);
+                consistencyChecker.resetCounter();
+                System.out.println(consistencyChecker.checkConsistency());
+                return "redirect:/owners/{ownerId}";
+            }
         }
     }
 

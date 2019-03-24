@@ -34,7 +34,7 @@ public class ConsistencyChecker {
 
     private ConsistencyChecker() {
         try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
+            oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
         }catch (SQLException e){
             System.out.println("Connection failed");
         }
@@ -89,12 +89,6 @@ public class ConsistencyChecker {
         PetsCRUD petsCRUD= new PetsCRUD();
 
         ResultSet pets;
-        Connection oldConn = null;
-        try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
-        }catch (SQLException e){
-            System.out.println("Connection failed");
-        }
 
         pets = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.pets");
 

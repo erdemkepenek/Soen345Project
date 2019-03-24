@@ -26,6 +26,8 @@ public class ConsistencyChecker {
     Connection oldConn = null;
     private static ConsistencyChecker consistencyChecker = new ConsistencyChecker();
     private int inconsistency = 0;
+    boolean write= false;
+    boolean read = false;
 
 
     public static ConsistencyChecker getInstance() {
@@ -157,9 +159,23 @@ public class ConsistencyChecker {
         System.out.println("Consistency Violation: " + type + " with ID " + id);
     }
 
-    private void violation(String type, String date) {
-        System.out.println("Consistency Violation: " + type + " with Date " + date);
+    public boolean getWrite(){
+        return write;
     }
+
+    public void setWrite(boolean write){
+        this.write = write;
+    }
+
+    public boolean getRead(){
+        return read;
+    }
+
+    public void setRead(boolean read){
+        this.read = read;
+    }
+
+
     public static void main(String[] args) throws SQLException{
         System.out.println("There are "+ConsistencyChecker.getInstance().checkConsistency()+" inconsistencies.");
     }

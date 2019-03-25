@@ -27,10 +27,12 @@ public class ConsistencyChecker {
     Connection oldConn = null;
     private static ConsistencyChecker consistencyChecker = new ConsistencyChecker();
     private int inconsistency = 0;
+    boolean write= false;
+    boolean read = false;
 
 
-    public static ConsistencyChecker getInstance(){
-         consistencyChecker.resetCounter();
+    public static ConsistencyChecker getInstance() {
+        consistencyChecker.resetCounter();
         try {
             if (consistencyChecker.oldConn.isClosed()) {
                 consistencyChecker.oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
@@ -43,7 +45,7 @@ public class ConsistencyChecker {
 
     private ConsistencyChecker() {
         try {
-            oldConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/petclinic", "root", "petclinic");
+            oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
         }catch (SQLException e){
             System.out.println("Connection failed");
         }
@@ -116,7 +118,7 @@ public class ConsistencyChecker {
 
             actual = petsCRUD.selectPetById(expected.getId());
             if (actual==null){
-            	petsCRUD.insert(expected);
+                petsCRUD.insert(expected);
                 inconsistency++;
                 violation("Owner", expected.getId());
             }
@@ -125,7 +127,7 @@ public class ConsistencyChecker {
                 || !expected.getDate().equals(actual.getDate())
                 || expected.getType()!=(actual.getType())
                 ||  expected.getOwner()!=(actual.getOwner())) {
-            	petsCRUD.update(expected.getId(), expected);
+                petsCRUD.update(expected.getId(), expected);
 
                 inconsistency++;
                 violation("Pet", expected.getId());
@@ -151,26 +153,26 @@ public class ConsistencyChecker {
         visits = oldConn.createStatement().executeQuery("SELECT * FROM petclinic.visits");
 
         while (visits.next()){
-        	expected.setId(visits.getInt("id"));
-        	expected.setPetId(visits.getInt("pet_id"));
-        	expected.setDate(visits.getDate("visist_date"));
-        	expected.setDescription(visits.getString("description"));
+            expected.setId(visits.getInt("id"));
+            expected.setPetId(visits.getInt("pet_id"));
+            expected.setDate(visits.getDate("visist_date"));
+            expected.setDescription(visits.getString("description"));
 
             actual = visitsCRUD.selectVisitById(expected.getId());
             if (actual==null){
-            	visitsCRUD.insert(expected);
+                visitsCRUD.insert(expected);
                 inconsistency++;
                 violation("Owner", expected.getId());
             }
 
             else if (
-            		(expected.getId() != actual.getId())
-            	||	(expected.getPetId() != actual.getPetId())
-                || (!expected.getDate().equals(actual.getDate()))
-                || (!expected.getDescription().equals(actual.getDescription()))
-                	)
-                	{
-            	visitsCRUD.update(expected.getId(), expected);
+                (expected.getId() != actual.getId())
+                    ||	(expected.getPetId() != actual.getPetId())
+                    || (!expected.getDate().equals(actual.getDate()))
+                    || (!expected.getDescription().equals(actual.getDescription()))
+            )
+            {
+                visitsCRUD.update(expected.getId(), expected);
 
                 inconsistency++;
                 violation("Pet", expected.getId());
@@ -181,7 +183,7 @@ public class ConsistencyChecker {
 
     public int checkConsistency() throws SQLException{
         this.checkOwners();
-      //  this.checkPets();
+        //  this.checkPets();
         //this.checkVisits();
         return inconsistency;
     }
@@ -195,9 +197,23 @@ public class ConsistencyChecker {
         System.out.println("Consistency Violation: " + type + " with ID " + id);
     }
 
-    private void violation(String type, String date) {
-        System.out.println("Consistency Violation: " + type + " with Date " + date);
+    public boolean getWrite(){
+        return write;
     }
+
+    public void setWrite(boolean write){
+        this.write = write;
+    }
+
+    public boolean getRead(){
+        return read;
+    }
+
+    public void setRead(boolean read){
+        this.read = read;
+    }
+
+
     public static void main(String[] args) throws SQLException{
         System.out.println("There are "+ConsistencyChecker.getInstance().checkConsistency()+" inconsistencies.");
     }

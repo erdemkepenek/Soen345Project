@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 
 import org.springframework.samples.petclinic.owner.*;
 
@@ -98,6 +99,51 @@ public class OwnerCRUD {
         }
 
         return owner;
+
+    }
+
+    public ArrayList<Owner> selectOwnersByLastName(String lastName) {
+
+        String sql;
+        if (lastName == null || lastName.equals("")) {
+            sql = "SELECT * FROM owners ORDER BY id ASC ";
+        }
+        else {
+            sql = "SELECT DISTINCT * FROM owners WHERE last_name like '"+lastName+"' ORDER BY id ASC ";
+        }
+
+        ResultSet rs;
+        ArrayList<Owner> owners = new ArrayList<>();
+
+        try {
+
+            Connection conn = this.connect();
+            Statement stmt  = conn.createStatement();
+            rs    = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+
+                //put all the values in an owner object
+                Owner owner = new Owner();
+                owner.setId(rs.getInt("id"));
+                owner.setFirstName(rs.getString("first_name"));
+                owner.setLastName(rs.getString("last_name"));
+                owner.setAddress(rs.getString("address"));
+                owner.setCity(rs.getString("city"));
+                owner.setTelephone(rs.getString("telephone"));
+                owners.add(owner);
+                System.out.println(rs.getString("first_name"));
+
+            }
+
+            return owners;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return owners;
+
     }
 
     

@@ -3,7 +3,7 @@ package forklift;
 
 import org.springframework.samples.petclinic.owner.Owner;
 
-import java.sql.ResultSet;
+import java.util.ArrayList;
 
 public class ShadowRead {
 
@@ -26,6 +26,8 @@ public class ShadowRead {
     public static Owner findOwnerByLastName(String lastName) {
         return ownerCRUD.selectOwnerByLastName(lastName);
     }
+
+    public static ArrayList<Owner> findOwnersByLastName(String lastName) {return ownerCRUD.selectOwnersByLastName(lastName);}
 
 
 }

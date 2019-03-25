@@ -136,6 +136,28 @@ public class ConsistencyChecker {
     }
 
 
+    public int readConsistencyChecking(Owner expected, Owner actual) {
+
+        OwnerCRUD ownerCRUD = new OwnerCRUD();
+        if (expected == null && actual == null) {
+            return 0;
+        }
+        if (expected == null) {
+            ownerCRUD.delete(actual);
+            return 1;
+        }
+        if (actual == null){
+            ownerCRUD.insert(expected);
+            return 1;
+        }
+
+        if (expected.equals(actual)) {
+            return 0;
+        }
+
+        ownerCRUD.update(expected.getId(),expected);
+        return 1;
+    }
 
     public void checkVisits() throws SQLException{
         SimpleVisit expected = new SimpleVisit();

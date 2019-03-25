@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import forklift.ShadowRead;
 import org.springframework.samples.petclinic.ConsistencyChecker;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,8 @@ import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Juergen Hoeller
@@ -94,6 +97,9 @@ class OwnerController {
 
         // find owners by last name
         Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+        Collection<Owner> shadowResults = ShadowRead.findOwnersByLastName(owner.getLastName());
+        boolean sizeCheck = (results.size() == shadowResults.size()) ? true:false;
+        System.out.println("Size check is: "+sizeCheck);
         if (results.isEmpty()) {
             // no owners found
             result.rejectValue("lastName", "notFound", "not found");
@@ -112,6 +118,21 @@ class OwnerController {
     @GetMapping("/owners/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
         Owner owner = this.owners.findById(ownerId);
+        ConsistencyChecker cc = ConsistencyChecker.getInstance();
+        if (cc.getRead()) {
+            // use Timer to delay shadow read and consistency checking to simulate asynchronous execution
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
+                    System.out.println("Shadow ID is: "+shadowOwner.getId());
+                    System.out.println("Read consistency: "+cc.readConsistencyChecking(owner,shadowOwner));
+                }
+            }, 3000);
+
+        }
+
         model.addAttribute(owner);
         return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
     }

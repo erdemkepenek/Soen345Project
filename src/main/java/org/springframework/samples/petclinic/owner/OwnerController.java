@@ -96,10 +96,26 @@ class OwnerController {
         }
 
         // find owners by last name
-        Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
-        Collection<Owner> shadowResults = ShadowRead.findOwnersByLastName(owner.getLastName());
-        boolean sizeCheck = (results.size() == shadowResults.size()) ? true:false;
-        System.out.println("Size check is: "+sizeCheck);
+        Collection<Owner> results;
+        ConsistencyChecker cc = ConsistencyChecker.getInstance();
+        if (!cc.getSwapped()) {
+            results = this.owners.findByLastName(owner.getLastName());
+        }
+        else {
+            results = ShadowRead.findOwnersByLastName(owner.getLastName());
+        }
+        if (!cc.getSwapped() && cc.getRead()) {
+            // use Timer to delay consistency checking to simulate asynchronous execution
+            Collection<Owner> shadowResults = ShadowRead.findOwnersByLastName(owner.getLastName());
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.out.println("Read inconsistency for two collections: "+cc.readConsistencyChecking(results, shadowResults));
+                }
+            }, 3000);
+        }
+
         if (results.isEmpty()) {
             // no owners found
             result.rejectValue("lastName", "notFound", "not found");
@@ -117,17 +133,22 @@ class OwnerController {
 
     @GetMapping("/owners/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
-        Owner owner = this.owners.findById(ownerId);
+        Owner owner;
         ConsistencyChecker cc = ConsistencyChecker.getInstance();
-        if (cc.getRead()) {
-            // use Timer to delay shadow read and consistency checking to simulate asynchronous execution
+        if(!cc.getSwapped()) {
+            owner = this.owners.findById(ownerId);
+        }
+        else {
+            owner = ShadowRead.findOwnerByID(ownerId);
+        }
+        if (!cc.getSwapped() && cc.getRead()) {
+            // use Timer to delay consistency checking to simulate asynchronous execution
+            Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
-                    System.out.println("Shadow ID is: "+shadowOwner.getId());
-                    System.out.println("Read consistency: "+cc.readConsistencyChecking(owner,shadowOwner));
+                    System.out.println("Read inconsistency for two objects: "+cc.readConsistencyChecking(owner,shadowOwner));
                 }
             }, 3000);
 

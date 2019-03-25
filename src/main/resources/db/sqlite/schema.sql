@@ -35,7 +35,7 @@ CREATE INDEX IF NOT EXISTS types_name
   ON types (name);
 
 CREATE TABLE IF NOT EXISTS owners (
-                      id         INTEGER IDENTITY PRIMARY KEY,
+                      id         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                       first_name VARCHAR(30),
                       last_name  VARCHAR_IGNORECASE(30),
                       address    VARCHAR(255),
@@ -46,7 +46,7 @@ CREATE INDEX IF NOT EXISTS owners_last_name
   ON owners (last_name);
 
 CREATE TABLE IF NOT EXISTS pets (
-                    id         INTEGER IDENTITY PRIMARY KEY,
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     name       VARCHAR(30),
                     birth_date DATE,
                     type_id    INTEGER NOT NULL,
@@ -65,7 +65,7 @@ CREATE INDEX IF NOT EXISTS pets_name
   ON pets (name);
 
 CREATE TABLE IF NOT EXISTS visits (
-                      id          INTEGER IDENTITY PRIMARY KEY,
+                      id          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                       pet_id      INTEGER NOT NULL,
                       visit_date  DATE,
                       description VARCHAR(255),

@@ -6,21 +6,10 @@ import forklift.SimplePet;
 import forklift.SimpleVisit;
 import forklift.VisitsCRUD;
 import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.owner.OwnerRepository;
-import org.springframework.samples.petclinic.owner.Pet;
-import org.springframework.samples.petclinic.owner.PetType;
-import org.springframework.samples.petclinic.vet.Specialty;
-import org.springframework.samples.petclinic.vet.Vet;
-import org.springframework.samples.petclinic.vet.VetRepository;
-import org.springframework.samples.petclinic.vet.Vets;
-import org.springframework.samples.petclinic.visit.Visit;
 
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 
 
 public class ConsistencyChecker {
@@ -29,6 +18,7 @@ public class ConsistencyChecker {
     private int inconsistency = 0;
     boolean write= false;
     boolean read = false;
+    boolean isSwapped = false;
 
 
     public static ConsistencyChecker getInstance() {
@@ -139,18 +129,17 @@ public class ConsistencyChecker {
     public int readConsistencyChecking(Owner expected, Owner actual) {
 
         OwnerCRUD ownerCRUD = new OwnerCRUD();
-        if (expected == null && actual == null) {
+        if (expected == null && (actual == null || actual.getId() == null)) {
             return 0;
         }
         if (expected == null) {
             ownerCRUD.delete(actual);
             return 1;
         }
-        if (actual == null){
+        if (actual == null || actual.getId() == null){
             ownerCRUD.insert(expected);
             return 1;
         }
-
         if (expected.equals(actual)) {
             return 0;
         }
@@ -158,6 +147,96 @@ public class ConsistencyChecker {
         ownerCRUD.update(expected.getId(),expected);
         return 1;
     }
+
+    public int readConsistencyChecking(Collection<Owner> expected, Collection<Owner> actual) {
+
+        int readInconsistency = 0; // reset
+        OwnerCRUD ownerCRUD = new OwnerCRUD();
+
+        // To handle null inputs
+        if (expected == null && actual == null) {
+            return readInconsistency;
+        }
+        if (expected == null) {
+            Iterator<Owner> actualIterator = actual.iterator();
+            while (actualIterator.hasNext()) {
+                ++readInconsistency;
+//                Owner actualOwner = actualIterator.next();
+                ownerCRUD.delete(actualIterator.next());
+            }
+            return readInconsistency;
+        }
+        if (actual == null) {
+            Iterator<Owner> expectedIterator = expected.iterator();
+            while (expectedIterator.hasNext()) {
+                ++readInconsistency;
+//                Owner expectedOwner = expectedIterator.next();
+                ownerCRUD.insert(expectedIterator.next());
+            }
+        }
+
+
+        String flag = "MATCH";
+
+        // update or insert the inconsistent records
+        Iterator<Owner> expectedIterator = expected.iterator();
+        while (expectedIterator.hasNext()) {
+            Owner expectedOwner = expectedIterator.next();
+            if (!checkIfOwnerExists(expectedOwner, actual)) {
+                flag = "MISS";
+                ++readInconsistency;
+                ownerCRUD.insert(expectedOwner);
+                violation("Owner", expectedOwner.getId());
+            } else {
+                if (!checkIfOwnerAttributesTheSame(expectedOwner, actual)){
+                    flag = "WRONG";
+                    ++readInconsistency;
+                    ownerCRUD.update(expectedOwner.getId(), expectedOwner);
+                    violation("Owner", expectedOwner.getId());
+                }
+            }
+        }
+
+        // delete the records not included in expected
+        Iterator<Owner> actualIterator = actual.iterator();
+        while (actualIterator.hasNext()) {
+            Owner actualOwner = actualIterator.next();
+            if (!checkIfOwnerExists(actualOwner, expected)) {
+                ++readInconsistency;
+                ownerCRUD.delete(actualOwner);
+                violation("Owner", actualOwner.getId());
+            }
+        }
+
+        return readInconsistency;
+    }
+
+    private Boolean checkIfOwnerExists(Owner expected, Collection<Owner> actual) {
+
+        Iterator<Owner> actualIterator = actual.iterator();
+        // check if the same id exist
+        while(actualIterator.hasNext()) {
+            Owner actualOwner = actualIterator.next();
+            if (expected.getId() == actualOwner.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Boolean checkIfOwnerAttributesTheSame(Owner expected, Collection<Owner> actual) {
+
+        Iterator<Owner> actualIterator = actual.iterator();
+        // check attributes
+        while (actualIterator.hasNext()) {
+            Owner actualOwner = actualIterator.next();
+            if (expected.equals(actualOwner)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void checkVisits() throws SQLException{
         SimpleVisit expected = new SimpleVisit();
@@ -233,6 +312,14 @@ public class ConsistencyChecker {
 
     public void setRead(boolean read){
         this.read = read;
+    }
+
+    public boolean getSwapped() {
+        return this.isSwapped;
+    }
+
+    public void setSwapped(boolean isSwapped) {
+        this.isSwapped = isSwapped;
     }
 
 

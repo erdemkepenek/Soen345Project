@@ -15,6 +15,7 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import forklift.ShadowRead;
 import org.springframework.samples.petclinic.ConsistencyChecker;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -94,6 +95,9 @@ class OwnerController {
 
         // find owners by last name
         Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
+        Collection<Owner> shadowResults = ShadowRead.findOwnersByLastName(owner.getLastName());
+        boolean sizeCheck = (results.size() == shadowResults.size()) ? true:false;
+        System.out.println("Size check is: "+sizeCheck);
         if (results.isEmpty()) {
             // no owners found
             result.rejectValue("lastName", "notFound", "not found");
@@ -112,6 +116,11 @@ class OwnerController {
     @GetMapping("/owners/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
         Owner owner = this.owners.findById(ownerId);
+
+        Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
+        System.out.println("Shadow ID is: "+shadowOwner.getId());
+        ConsistencyChecker cc = ConsistencyChecker.getInstance();
+//        System.out.println("Read consistency: "+cc.readConsistencyChecking(owner,shadowOwner));
         model.addAttribute(owner);
         return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
     }

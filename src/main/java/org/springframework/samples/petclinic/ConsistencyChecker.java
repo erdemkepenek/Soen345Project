@@ -29,7 +29,15 @@ public class ConsistencyChecker {
     private int inconsistency = 0;
 
 
-    public static ConsistencyChecker getInstance() {
+    public static ConsistencyChecker getInstance(){
+         consistencyChecker.resetCounter();
+        try {
+            if (consistencyChecker.oldConn.isClosed()) {
+                consistencyChecker.oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
         return consistencyChecker;
     }
 

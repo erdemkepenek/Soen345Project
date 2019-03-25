@@ -106,7 +106,7 @@ public class Forklifter {
             Date birth_date = rs.getDate("visit_date");
             String description = rs.getString("description");
             dbTo.createStatement().execute("INSERT OR REPLACE INTO visits" +
-                " VALUES (\""+id+"\", \""+pet_id+"\", \""+birth_date+"\", \""+description+"\")");
+                " VALUES (\""+id+"\", \""+pet_id+"\", \""+birth_date.getTime()+"\", \""+description+"\")");
         }
     }
 
@@ -118,7 +118,7 @@ public class Forklifter {
             int type_id = rs.getInt("type_id");
             int city = rs.getInt("owner_id");
             dbTo.createStatement().execute("INSERT OR REPLACE INTO pets" +
-                " VALUES (\""+id+"\", \""+name+"\", \""+birth_date+"\", \""+type_id+"\", \""+city+"\")");
+                " VALUES (\""+id+"\", \""+name+"\", \""+birth_date.getTime()+"\", \""+type_id+"\", \""+city+"\")");
         }
     }
 

@@ -1,7 +1,8 @@
-package forklift;
+package migration;
 
 import static org.junit.Assert.*;
 
+import forklift.Forklifter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

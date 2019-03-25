@@ -38,8 +38,8 @@ public class PetClinicApplication {
         Forklifter.doYouEvenForkLift();
         ConsistencyChecker consistencyChecker = ConsistencyChecker.getInstance();
         // Shadow write mode
-        consistencyChecker.setWrite(true);
-        consistencyChecker.setRead(false);
+        consistencyChecker.setWrite(false);
+        consistencyChecker.setRead(true);
 
     }
 

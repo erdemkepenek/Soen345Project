@@ -31,6 +31,8 @@ import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Juergen Hoeller
@@ -116,11 +118,21 @@ class OwnerController {
     @GetMapping("/owners/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
         Owner owner = this.owners.findById(ownerId);
-
-        Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
-        System.out.println("Shadow ID is: "+shadowOwner.getId());
         ConsistencyChecker cc = ConsistencyChecker.getInstance();
-//        System.out.println("Read consistency: "+cc.readConsistencyChecking(owner,shadowOwner));
+        if (cc.getRead()) {
+            // use Timer to delay shadow read and consistency checking to simulate asynchronous execution
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Owner shadowOwner = ShadowRead.findOwnerByID(ownerId);
+                    System.out.println("Shadow ID is: "+shadowOwner.getId());
+                    System.out.println("Read consistency: "+cc.readConsistencyChecking(owner,shadowOwner));
+                }
+            }, 3000);
+
+        }
+
         model.addAttribute(owner);
         return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
     }

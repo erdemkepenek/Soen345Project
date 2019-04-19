@@ -37,7 +37,7 @@ public class PetClinicApplication {
         SpringApplication.run(PetClinicApplication.class, args);
         Forklifter.doYouEvenForkLift();
         ConsistencyChecker consistencyChecker = ConsistencyChecker.getInstance();
-        // Shadow write mode
+        //Shadow write mode
         consistencyChecker.setWrite(false);
         consistencyChecker.setRead(true);
 

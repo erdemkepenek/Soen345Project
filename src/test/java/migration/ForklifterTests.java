@@ -23,7 +23,7 @@ public class ForklifterTests {
     public void setup(){
         try {
             testConn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/db/sqlite/sqlite.db");
-            testOldConn = DriverManager.getConnection("jdbc:mysql://room3.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
+            testOldConn = DriverManager.getConnection("jdbc:mysql://room3.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC","eglen@room3","Concordia01");
         }catch (SQLException e){
             System.out.println("Connection failed");
         }

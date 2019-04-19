@@ -68,20 +68,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Dave Syer
  */
 
-@RunWith(SpringRunner.class)
-@DataJpaTest
+//@RunWith(SpringRunner.class)
+//@DataJpaTest
 public class ClinicServiceTests {
 
-    @Autowired
+    //@Autowired
     protected OwnerRepository owners;
 
-    @Autowired
+    //@Autowired
     protected PetRepository pets;
 
-    @Autowired
+    //@Autowired
     protected VisitRepository visits;
 
-    @Autowired
+    //@Autowired
     protected VetRepository vets;
 
     //@Test

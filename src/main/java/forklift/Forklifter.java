@@ -19,7 +19,7 @@ public class Forklifter {
         Connection oldConn = null;
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:src/main/resources/db/sqlite/sqlite.db");
-            oldConn = DriverManager.getConnection("jdbc:mysql://eglencecaj.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", "eglen@eglencecaj", "Soen344room3");
+            oldConn = DriverManager.getConnection("jdbc:mysql://room3.mysql.database.azure.com/petclinic?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC","eglen@room3","Concordia01");
             buildDatabase(conn, true);
             addData(oldConn,conn);
             System.out.println("Forklift complete!, Enjoy 😉");
